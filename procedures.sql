@@ -114,9 +114,9 @@ end;
 
 -- CheckAvailablePlaces function
 create or replace function CheckAvailablePlaces(trip_id int)
-    return boolean
+    return int
     is
-    result           boolean := false;
+    result           int := 0;
     available_places int;
 begin
     select atv.NO_AVAILABLE_PLACES
@@ -125,7 +125,7 @@ begin
     where atv.trip_id = CheckAvailablePlaces.trip_id;
 
     if available_places <> 0 then
-        result := true;
+        result := 1;
     end if;
 
     return result;
@@ -143,6 +143,7 @@ create or replace procedure AddReservation(trip_id trip.trip_id%TYPE, person_id 
 as
     person_exists  number;
     trip_available number;
+    reservation_id int;
 begin
 
     select COUNT(*) into person_exists from person where person.person_id = AddReservation.person_id;
@@ -162,7 +163,11 @@ begin
 
 
     insert into reservation (TRIP_ID, PERSON_ID, STATUS)
-    values (AddReservation.trip_id, AddReservation.person_id, 'N');
+    values (AddReservation.trip_id, AddReservation.person_id, 'N')
+    returning reservation_id into AddReservation.reservation_id;
+
+    insert into log(reservation_id, log_date, status)
+    values (AddReservation.reservation_id, current_date, 'N');
 end;
 
 -- ====================================================================================================================
@@ -201,22 +206,25 @@ begin
         RAISE_APPLICATION_ERROR(-20005, 'The trip for which given reservation was made has already started!');
     end if;
 
-
     -- here we know that input data are correct! now we just have to check if we can change states
 
     select r.status into old_status from reservation r where r.RESERVATION_ID = ModifyReservationStatus.reservation_id;
-    -- status 'N' (new) can be changed to any status
-    -- status 'P' (confirmed) can be changed to 'C'
-    -- status 'C' cannot be changed to any status ?? can be set to new (?)
+    if ModifyReservationStatus.status = old_status then
+        raise_application_error(-20003, 'Given reservation already has such status!');
+    end if;
+
     case
         when old_status = 'C'
             then if MODIFYRESERVATIONSTATUS.status <> 'N' then
                 raise_application_error(-20003, 'Canceled reservation must be set to "N" (new) status first!');
                  end if;
 
-                 if CHECKAVAILABLEPLACES(trip_id) = false then
+                 if CheckAvailablePlaces(trip_id) = 0 then
                      raise_application_error(-20003, 'There are no free places left for the trip!');
+
+
                  end if;
+
 
         when old_status = 'P'
             then if (ModifyReservationStatus.status <> 'C') then
@@ -233,7 +241,11 @@ begin
     where RESERVATION_ID = ModifyReservationStatus.reservation_id;
 
 
-end;
+    insert into Log(reservation_id, log_date, status)
+    values (ModifyReservationStatus.reservation_id, current_date, ModifyReservationStatus.status);
+
+
+end ;
 
 -- ====================================================================================================================
 
@@ -270,3 +282,7 @@ begin
     where trip_id = ModifyNoPlaces.trip_id;
 
 end;
+
+
+
+
