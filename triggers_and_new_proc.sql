@@ -133,3 +133,25 @@ begin
 
 
 end ;
+
+
+
+create or replace trigger CheckIfPlacesAvailableTrigger
+    before insert on reservation
+    for each row
+    declare
+        trip_id int;
+    begin
+        trip_id := :new.trip_id;
+        if CHECKAVAILABLEPLACES(trip_id) = 0 then
+            raise_application_error(-20003, 'There are no free places for that trip!');
+        end if;
+
+    end;
+
+
+
+
+-- ex.8.
+-- zakładamy, że autorowi chodziło o kontrolę czy dana rezerwacja może zostać dodana / zmieniony status
+
