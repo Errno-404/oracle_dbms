@@ -184,6 +184,7 @@ begin
     returning reservation_id into AddReservation9_0.reservation_id;
 
 
+    available_places := is_available;
     available_places := available_places - 1;
 
 
@@ -326,8 +327,10 @@ begin
     end if;
 
     update Trip
-    set MAX_NO_PLACES = ModifyNoPlaces9_0.no_places
+    set MAX_NO_PLACES = ModifyNoPlaces9_0.no_places, TRIP.no_available_places = ModifyNoPlaces9_0.no_places - reserved_places
     where trip_id = ModifyNoPlaces9_0.trip_id;
+
+
 
 end;
 
