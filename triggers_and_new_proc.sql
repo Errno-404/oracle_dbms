@@ -134,7 +134,7 @@ begin
 
 end ;
 
-
+-- ex 8.
 
 create or replace trigger CheckIfPlacesAvailableTrigger
     before insert on reservation
@@ -143,10 +143,11 @@ create or replace trigger CheckIfPlacesAvailableTrigger
         trip_id int;
     begin
         trip_id := :new.trip_id;
+
+
         if CHECKAVAILABLEPLACES(trip_id) = 0 then
             raise_application_error(-20003, 'There are no free places for that trip!');
         end if;
-
     end;
 
 
@@ -155,3 +156,24 @@ create or replace trigger CheckIfPlacesAvailableTrigger
 -- ex.8.
 -- zakładamy, że autorowi chodziło o kontrolę czy dana rezerwacja może zostać dodana / zmieniony status
 
+create or replace procedure AddReservation2(trip_id trip.trip_id%TYPE, person_id person.person_id%TYPE)
+as
+    person_exists  number;
+    trip_exists number;
+begin
+
+    select COUNT(*) into person_exists from person where person.person_id = AddReservation2.person_id;
+    if person_exists = 0 then
+        RAISE_APPLICATION_ERROR(-20002, 'Person with chosen ID not found.');
+    end if;
+    select COUNT(*) into trip_exists from trip where trip.trip_id = AddReservation2.trip_id;
+    if trip_exists = 0 then
+        RAISE_APPLICATION_ERROR(-20002, 'Such trip does not exist!');
+    end if;
+
+    insert into reservation (TRIP_ID, PERSON_ID, STATUS)
+    values (AddReservation2.trip_id, AddReservation2.person_id, 'N');
+
+    dbms_output.PUT_LINE('here');
+
+end;

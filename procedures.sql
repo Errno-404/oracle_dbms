@@ -119,10 +119,10 @@ create or replace function CheckAvailablePlaces(trip_id int)
     result           int := 0;
     available_places int;
 begin
-    select atv.NO_AVAILABLE_PLACES
+    select count(*)
     into available_places
     from AVAILABLETRIPSVIEW1 atv
-    where atv.trip_id = CheckAvailablePlaces.trip_id;
+    where atv.trip_id = CheckAvailablePlaces.trip_id and atv.NO_AVAILABLE_PLACES > 0;
 
     if available_places <> 0 then
         result := 1;
