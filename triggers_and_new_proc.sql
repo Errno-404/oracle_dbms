@@ -154,7 +154,6 @@ create or replace trigger CheckIfPlacesAvailableTrigger
 
 
 -- ex.8.
--- zakładamy, że autorowi chodziło o kontrolę czy dana rezerwacja może zostać dodana / zmieniony status
 
 create or replace procedure AddReservation2(trip_id trip.trip_id%TYPE, person_id person.person_id%TYPE)
 as
@@ -174,6 +173,8 @@ begin
     insert into reservation (TRIP_ID, PERSON_ID, STATUS)
     values (AddReservation2.trip_id, AddReservation2.person_id, 'N');
 
-    dbms_output.PUT_LINE('here');
 
 end;
+
+    -- ex8 b) skipped
+
