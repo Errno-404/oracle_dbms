@@ -55,7 +55,7 @@ select c.country_name,
                                        join trip tw on rw.trip_id = tw.trip_id
                               where rw.status != 'C'
                                 and t.trip_id = tw.trip_id
-                              group by rw.Trip_id), t.MAX_NO_PLACES) no_available_places
+                              group by rw.Trip_id), t.MAX_NO_PLACES) no_available_places_v
 from trip t
          join country c on t.COUNTRY_ID = c.COUNTRY_ID;
 
@@ -69,7 +69,7 @@ select country_name,
        trip_name,
        trip_id,
        max_no_places,
-       no_available_places
+       no_available_places_v
 from Trips_1
 where trip_date > current_date;
 
@@ -81,10 +81,10 @@ select country_name,
        trip_date,
        trip_name,
        max_no_places,
-       no_available_places
+       no_available_places_v
 from FutureTrips
 where trip_date > current_date
-  and no_available_places > 0;
+  and no_available_places_v > 0;
 
 
 
@@ -93,4 +93,67 @@ create or replace view AvailableTripsView_1
 as
 select *
 from FutureTrips
+where no_available_places_v > 0;
+
+
+-- views
+
+-- Trips
+create or replace view Trips9_0
+as
+select t.country_name,
+       t.TRIP_DATE,
+       t.TRIP_NAME,
+       t.MAX_NO_PLACES,
+       t.no_available_places
+from Trips9_1 t;
+
+
+
+-- Trips9_1 (with additional trip_id)
+create or replace view Trips9_1
+as
+select c.country_name,
+       t.TRIP_DATE,
+       t.TRIP_NAME,
+       t.trip_id,
+       t.MAX_NO_PLACES,
+       t.NO_AVAILABLE_PLACES
+from trip t
+         join country c on t.COUNTRY_ID = c.COUNTRY_ID;
+
+
+
+-- FutureTrips1
+create or replace view FutureTrips9_0
+as
+select country_name,
+       trip_date,
+       trip_name,
+       trip_id,
+       max_no_places,
+       no_available_places
+from Trips9_1
+where trip_date > current_date;
+
+
+-- AvailableTrips1
+create or replace view AvailableTripsView9_0
+as
+select country_name,
+       trip_date,
+       trip_name,
+       max_no_places,
+       no_available_places
+from FutureTrips9_0
+where trip_date > current_date
+  and no_available_places > 0;
+
+
+
+-- AvailableTrips1
+create or replace view AvailableTripsView9_1
+as
+select *
+from FutureTrips9_0
 where no_available_places > 0;
