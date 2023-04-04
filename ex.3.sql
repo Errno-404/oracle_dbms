@@ -37,7 +37,7 @@ select t.country_name,
        t.TRIP_DATE,
        t.TRIP_NAME,
        t.MAX_NO_PLACES,
-       t.no_available_places
+       t.no_available_places_v
 from Trips_1 t;
 
 

@@ -31,7 +31,7 @@ begin
                            status) bulk collect
     into result
     from reservations_1 r
-    where r.trip_id = TripParticipants.trip_id;
+    where r.trip_id = TripParticipants.trip_id and r.status <> 'C';
 
     return result;
 end;
@@ -98,7 +98,7 @@ begin
                          trip_date,
                          trip_name,
                          max_no_places,
-                         no_available_places) bulk collect
+                         no_available_places_v) bulk collect
     into result
     from AVAILABLETRIPSVIEW
     where COUNTRY_NAME = AvailableTrips.country

@@ -75,7 +75,7 @@ create or replace procedure PopulateWithData
     is
 begin
     UPDATE Trip t
-    SET t.no_available_places = (SELECT ts.NO_AVAILABLE_PLACES
+    SET t.no_available_places = (SELECT ts.NO_AVAILABLE_PLACES_v
                                  FROM Trips_1 ts
                                  WHERE ts.trip_id = t.TRIP_ID);
 end;

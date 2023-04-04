@@ -165,7 +165,7 @@ create or replace trigger ForbiddenCapacityChange
     for each row
 begin
     if :old.MAX_NO_PLACES - :old.no_available_places > :new.max_no_places then
-        raise_application_error(-20003, 'Dont');
+        raise_application_error(-20003, 'Cannot set max_no_places below number of current reservations!');
     end if;
 end;
 

@@ -1,6 +1,3 @@
--- only first trigger implemented!!!
-
-
 create or replace trigger CheckIfPlacesAvailableTrigger
     before insert
     on reservation
@@ -62,20 +59,18 @@ declare
     pragma autonomous_transaction ;
     available_places int;
 begin
-    dbms_output.PUT_LINE('working');
-
     case
         when :old.status = 'C' then if :new.status = 'P' then
-            raise_application_error(-20003, 'Error');
+            raise_application_error(-20003, 'Cannot change status from C to P!');
                                     end if;
 
                                     available_places := CHECKAVAILABLEPLACES(:old.TRIP_ID);
                                     if available_places = 0 then
-                                        raise_application_error(-20003, 'dont');
+                                        raise_application_error(-20003, 'The trip is full!');
                                     end if;
 
         when :old.status = 'P' then if :new.status = 'N' then
-            raise_application_error(-20003, 'Error');
+            raise_application_error(-20003, 'Paid reservation cannot be changed to the New one!');
         end if;
         else null;
         end case;
@@ -126,8 +121,6 @@ begin
     if ModifyReservationStatus8_0.status = old_status then
         raise_application_error(-20003, 'Given reservation already has such status!');
     end if;
-
-
 
 
     update RESERVATION

@@ -72,7 +72,7 @@ begin
     -- checking if reservation exists
     select COUNT(*)
     into reservation_exists
-    from Reservations r
+    from Reservation r
     where r.reservation_id = ModifyReservationStatus.reservation_id;
     if reservation_exists = 0 then
         RAISE_APPLICATION_ERROR(-20005, 'Reservation with chosen ID does not exist!');
@@ -84,7 +84,7 @@ begin
     end if;
 
 
-    select r.trip_id into trip_id from Reservations_1 r where r.RESERVATION_ID = MODIFYRESERVATIONSTATUS.reservation_id;
+    select r.trip_id into trip_id from Reservation r where r.RESERVATION_ID = MODIFYRESERVATIONSTATUS.reservation_id;
 
     -- checking if trip has already started
     select COUNT(*)
@@ -155,7 +155,7 @@ begin
     end if;
 
     -- saving free places
-    select (ft.max_no_places - ft.no_available_places)
+    select (ft.max_no_places - ft.no_available_places_v)
     into reserved_places
     from FUTURETRIPS ft
     where ft.trip_id = ModifyNoPlaces.trip_id;
