@@ -8,12 +8,12 @@ select r.country_name,
        r.lastname,
        r.reservation_id,
        r.status
-from Reservations1 r;
+from Reservations_1 r;
 
 
 
 -- Reservations1 (with extra data _id)
-create or replace view Reservations1
+create or replace view Reservations_1
 as
 select c.country_name,
        t.trip_date,
@@ -38,12 +38,12 @@ select t.country_name,
        t.TRIP_NAME,
        t.MAX_NO_PLACES,
        t.no_available_places
-from Trips1 t;
+from Trips_1 t;
 
 
 
 -- Trips1 (with additional trip_id)
-create or replace view Trips1
+create or replace view Trips_1
 as
 select c.country_name,
        t.TRIP_DATE,
@@ -57,7 +57,6 @@ select c.country_name,
                                 and t.trip_id = tw.trip_id
                               group by rw.Trip_id), t.MAX_NO_PLACES) no_available_places
 from trip t
-         join reservation r on t.trip_id = r.reservation_id
          join country c on t.COUNTRY_ID = c.COUNTRY_ID;
 
 
@@ -71,7 +70,7 @@ select country_name,
        trip_id,
        max_no_places,
        no_available_places
-from Trips1
+from Trips_1
 where trip_date > current_date;
 
 
@@ -83,14 +82,14 @@ select country_name,
        trip_name,
        max_no_places,
        no_available_places
-from trips
+from FutureTrips
 where trip_date > current_date
   and no_available_places > 0;
 
 
 
 -- AvailableTrips1
-create or replace view AvailableTripsView1
+create or replace view AvailableTripsView_1
 as
 select *
 from FutureTrips
